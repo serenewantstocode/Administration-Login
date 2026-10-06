@@ -1,743 +1,288 @@
 // ==========================================
 // SAHAYSETU ADMINISTRATION DASHBOARD
+// FRONTEND DEMO VERSION
 // ==========================================
 
 
-// BACKEND URL
+// ==========================================
+// SAMPLE USERS
+// ==========================================
 
-const API_URL = "http://192.168.1.36:8000";
+const users = [
 
+    {
+        id: "U001",
+        name: "Rahul Sharma",
+        email: "rahul@gmail.com",
+        role: "Citizen",
+        status: "Active"
+    },
 
-// DATA
+    {
+        id: "U002",
+        name: "Priya Singh",
+        email: "priya@gmail.com",
+        role: "Citizen",
+        status: "Active"
+    },
 
-let users = [];
+    {
+        id: "U003",
+        name: "Amit Kumar",
+        email: "amit@sahaysetu.in",
+        role: "Worker",
+        status: "Active"
+    },
 
-let complaints = [];
+    {
+        id: "U004",
+        name: "Neha Verma",
+        email: "neha@sahaysetu.in",
+        role: "Authority",
+        status: "Active"
+    },
 
+    {
+        id: "U005",
+        name: "Admin",
+        email: "admin@sahaysetu.in",
+        role: "Administration",
+        status: "Active"
+    },
+
+    {
+        id: "U006",
+        name: "Rohit Gupta",
+        email: "rohit@gmail.com",
+        role: "Citizen",
+        status: "Inactive"
+    }
+
+];
 
 
 // ==========================================
-// PAGE START
+// SAMPLE COMPLAINTS
+// ==========================================
+
+const complaints = [
+
+    {
+        id: "C001",
+        title: "Large pothole on main road",
+        location: "Raj Nagar, Ghaziabad",
+        priority: "High",
+        status: "Pending"
+    },
+
+    {
+        id: "C002",
+        title: "Streetlight not working",
+        location: "Indirapuram, Ghaziabad",
+        priority: "Medium",
+        status: "In Progress"
+    },
+
+    {
+        id: "C003",
+        title: "Open drain near residential area",
+        location: "Vaishali, Ghaziabad",
+        priority: "High",
+        status: "Resolved"
+    },
+
+    {
+        id: "C004",
+        title: "Garbage collection issue",
+        location: "Vasundhara, Ghaziabad",
+        priority: "Medium",
+        status: "Pending"
+    },
+
+    {
+        id: "C005",
+        title: "Broken footpath",
+        location: "Crossings Republik",
+        priority: "Low",
+        status: "Resolved"
+    },
+
+    {
+        id: "C006",
+        title: "Water leakage on road",
+        location: "Kavi Nagar, Ghaziabad",
+        priority: "High",
+        status: "In Progress"
+    }
+
+];
+
+
+// ==========================================
+// PAGE LOAD
 // ==========================================
 
 document.addEventListener(
     "DOMContentLoaded",
     function () {
 
-        checkLogin();
+        displayRecentComplaints();
 
-        loadUsers();
+        displayUsers(users);
 
-        loadComplaints();
+        displayComplaints(complaints);
 
     }
 );
 
 
-
 // ==========================================
-// CHECK LOGIN
-// ==========================================
-
-function checkLogin() {
-
-    const token =
-        localStorage.getItem("access_token");
-
-
-    if (!token) {
-
-        window.location.href =
-            "administration-login.html";
-
-        return;
-
-    }
-
-
-    const adminLogin =
-        localStorage.getItem("admin_login");
-
-
-    if (adminLogin) {
-
-        document.getElementById(
-            "adminName"
-        ).textContent = adminLogin;
-
-    }
-
-}
-
-
-
-// ==========================================
-// API HEADERS
+// NAVIGATION
 // ==========================================
 
-function getHeaders() {
+function showSection(sectionId, button) {
 
-    const token =
-        localStorage.getItem("access_token");
+    const sections =
+        document.querySelectorAll(".section");
 
 
-    return {
+    sections.forEach(
+        function (section) {
 
-        "Authorization":
-            "Bearer " + token,
-
-        "Content-Type":
-            "application/json"
-
-    };
-
-}
-
-
-
-// ==========================================
-// LOAD USERS
-// GET /admin/users
-// ==========================================
-
-async function loadUsers() {
-
-    const table =
-        document.getElementById(
-            "usersTable"
-        );
-
-
-    table.innerHTML = `
-        <tr>
-            <td colspan="5">
-                Loading users...
-            </td>
-        </tr>
-    `;
-
-
-    try {
-
-        const response =
-            await fetch(
-                API_URL + "/admin/users",
-                {
-                    method: "GET",
-                    headers: getHeaders()
-                }
-            );
-
-
-        if (response.status === 401) {
-
-            logout();
-
-            return;
-
-        }
-
-
-        const data =
-            await response.json();
-
-
-        console.log(
-            "Users:",
-            data
-        );
-
-
-        if (Array.isArray(data)) {
-
-            users = data;
-
-        }
-
-        else if (
-            Array.isArray(data.users)
-        ) {
-
-            users = data.users;
-
-        }
-
-        else if (
-            Array.isArray(data.data)
-        ) {
-
-            users = data.data;
-
-        }
-
-        else {
-
-            users = [];
-
-        }
-
-
-        document.getElementById(
-            "totalUsers"
-        ).textContent =
-            users.length;
-
-
-        displayUsers(users);
-
-    }
-
-
-    catch (error) {
-
-        console.error(
-            "Users error:",
-            error
-        );
-
-
-        table.innerHTML = `
-            <tr>
-                <td colspan="5">
-                    Unable to connect to backend.
-                </td>
-            </tr>
-        `;
-
-    }
-
-}
-
-
-
-// ==========================================
-// DISPLAY USERS
-// ==========================================
-
-function displayUsers(list) {
-
-    const table =
-        document.getElementById(
-            "usersTable"
-        );
-
-
-    if (!list.length) {
-
-        table.innerHTML = `
-            <tr>
-                <td colspan="5">
-                    No users found.
-                </td>
-            </tr>
-        `;
-
-        return;
-
-    }
-
-
-    table.innerHTML = "";
-
-
-    list.forEach(
-        function (user) {
-
-            const id =
-                user.id ??
-                user.user_id ??
-                "-";
-
-
-            const name =
-                user.name ??
-                user.full_name ??
-                user.username ??
-                "—";
-
-
-            const contact =
-                user.email ??
-                user.phone ??
-                "—";
-
-
-            const role =
-                user.role ??
-                user.user_role ??
-                "—";
-
-
-            const active =
-                user.is_active ??
-                user.active ??
-                true;
-
-
-            const status =
-                active
-                    ? "Active"
-                    : "Inactive";
-
-
-            table.innerHTML += `
-
-                <tr>
-
-                    <td>
-                        ${id}
-                    </td>
-
-                    <td>
-                        ${name}
-                    </td>
-
-                    <td>
-                        ${contact}
-                    </td>
-
-                    <td>
-                        ${role}
-                    </td>
-
-                    <td>
-
-                        <span class="status ${
-                            active
-                                ? "resolved"
-                                : "pending"
-                        }">
-
-                            ${status}
-
-                        </span>
-
-                    </td>
-
-                </tr>
-
-            `;
+            section.classList.remove("active");
 
         }
     );
 
-}
 
+    const buttons =
+        document.querySelectorAll(".nav-btn");
 
 
-// ==========================================
-// FILTER USERS
-// ==========================================
+    buttons.forEach(
+        function (btn) {
 
-function filterUsers() {
-
-    const search =
-        document
-            .getElementById(
-                "userSearch"
-            )
-            .value
-            .toLowerCase();
-
-
-    const filtered =
-        users.filter(
-            function (user) {
-
-                return JSON.stringify(user)
-                    .toLowerCase()
-                    .includes(search);
-
-            }
-        );
-
-
-    displayUsers(filtered);
-
-}
-
-
-
-// ==========================================
-// LOAD COMPLAINTS
-// GET /admin/complaints
-// ==========================================
-
-async function loadComplaints() {
-
-    const table =
-        document.getElementById(
-            "complaintsTable"
-        );
-
-
-    table.innerHTML = `
-        <tr>
-            <td colspan="5">
-                Loading complaints...
-            </td>
-        </tr>
-    `;
-
-
-    try {
-
-        const response =
-            await fetch(
-                API_URL + "/admin/complaints",
-                {
-                    method: "GET",
-                    headers: getHeaders()
-                }
-            );
-
-
-        if (response.status === 401) {
-
-            logout();
-
-            return;
-
-        }
-
-
-        const data =
-            await response.json();
-
-
-        console.log(
-            "Complaints:",
-            data
-        );
-
-
-        if (Array.isArray(data)) {
-
-            complaints = data;
-
-        }
-
-        else if (
-            Array.isArray(data.complaints)
-        ) {
-
-            complaints =
-                data.complaints;
-
-        }
-
-        else if (
-            Array.isArray(data.data)
-        ) {
-
-            complaints =
-                data.data;
-
-        }
-
-        else if (
-            Array.isArray(data.results)
-        ) {
-
-            complaints =
-                data.results;
-
-        }
-
-        else {
-
-            complaints = [];
-
-        }
-
-
-        document.getElementById(
-            "totalComplaints"
-        ).textContent =
-            complaints.length;
-
-
-        calculateStatistics();
-
-        displayComplaints(
-            complaints
-        );
-
-        displayRecentComplaints();
-
-    }
-
-
-    catch (error) {
-
-        console.error(
-            "Complaints error:",
-            error
-        );
-
-
-        table.innerHTML = `
-            <tr>
-                <td colspan="5">
-                    Unable to connect to backend.
-                </td>
-            </tr>
-        `;
-
-    }
-
-}
-
-
-
-// ==========================================
-// COMPLAINT STATUS
-// ==========================================
-
-function getStatus(complaint) {
-
-    return (
-        complaint.status ??
-        complaint.complaint_status ??
-        "Pending"
-    );
-
-}
-
-
-
-// ==========================================
-// DISPLAY COMPLAINTS
-// ==========================================
-
-function displayComplaints(list) {
-
-    const table =
-        document.getElementById(
-            "complaintsTable"
-        );
-
-
-    if (!list.length) {
-
-        table.innerHTML = `
-            <tr>
-                <td colspan="5">
-                    No complaints found.
-                </td>
-            </tr>
-        `;
-
-        return;
-
-    }
-
-
-    table.innerHTML = "";
-
-
-    list.forEach(
-        function (complaint) {
-
-            const id =
-                complaint.id ??
-                complaint.complaint_id ??
-                "-";
-
-
-            const description =
-                complaint.description ??
-                complaint.title ??
-                complaint.complaint ??
-                "No description";
-
-
-            const location =
-                complaint.location ??
-                complaint.address ??
-                "Not available";
-
-
-            const priority =
-                complaint.priority ??
-                complaint.severity ??
-                "Normal";
-
-
-            const status =
-                getStatus(complaint);
-
-
-            const statusLower =
-                status.toLowerCase();
-
-
-            let statusClass =
-                "pending";
-
-
-            if (
-                statusLower.includes(
-                    "resolve"
-                )
-            ) {
-
-                statusClass =
-                    "resolved";
-
-            }
-
-            else if (
-                statusLower.includes(
-                    "progress"
-                )
-            ) {
-
-                statusClass =
-                    "progress";
-
-            }
-
-
-            table.innerHTML += `
-
-                <tr>
-
-                    <td>
-                        ${id}
-                    </td>
-
-                    <td>
-                        ${description}
-                    </td>
-
-                    <td>
-                        ${location}
-                    </td>
-
-                    <td>
-                        ${priority}
-                    </td>
-
-                    <td>
-
-                        <span class="status ${statusClass}">
-
-                            ${status}
-
-                        </span>
-
-                    </td>
-
-                </tr>
-
-            `;
+            btn.classList.remove("active");
 
         }
     );
 
-}
+
+    const selectedSection =
+        document.getElementById(sectionId);
 
 
+    if (selectedSection) {
 
-// ==========================================
-// FILTER COMPLAINTS
-// ==========================================
+        selectedSection.classList.add("active");
 
-function filterComplaints() {
-
-    const search =
-        document
-            .getElementById(
-                "complaintSearch"
-            )
-            .value
-            .toLowerCase();
+    }
 
 
-    const selected =
-        document
-            .getElementById(
-                "statusFilter"
-            )
-            .value;
+    if (button) {
+
+        button.classList.add("active");
+
+    }
 
 
-    const filtered =
-        complaints.filter(
-            function (complaint) {
-
-                const text =
-                    JSON.stringify(
-                        complaint
-                    ).toLowerCase();
-
-
-                const status =
-                    getStatus(
-                        complaint
-                    ).toLowerCase();
-
-
-                const matchesSearch =
-                    text.includes(search);
-
-
-                let matchesStatus =
-                    true;
-
-
-                if (
-                    selected === "pending"
-                ) {
-
-                    matchesStatus =
-                        status.includes(
-                            "pending"
-                        );
-
-                }
-
-
-                if (
-                    selected === "progress"
-                ) {
-
-                    matchesStatus =
-                        status.includes(
-                            "progress"
-                        );
-
-                }
-
-
-                if (
-                    selected === "resolved"
-                ) {
-
-                    matchesStatus =
-                        status.includes(
-                            "resolve"
-                        );
-
-                }
-
-
-                return (
-                    matchesSearch &&
-                    matchesStatus
-                );
-
-            }
-        );
-
-
-    displayComplaints(
-        filtered
-    );
+    updatePageTitle(sectionId);
 
 }
 
+
+// ==========================================
+// SHOW SECTION WITHOUT BUTTON
+// ==========================================
+
+function showSectionByName(sectionId) {
+
+    const buttons =
+        document.querySelectorAll(".nav-btn");
+
+
+    let button = null;
+
+
+    if (sectionId === "dashboard") {
+        button = buttons[0];
+    }
+
+    if (sectionId === "users") {
+        button = buttons[1];
+    }
+
+    if (sectionId === "complaints") {
+        button = buttons[2];
+    }
+
+    if (sectionId === "system") {
+        button = buttons[3];
+    }
+
+
+    showSection(sectionId, button);
+
+}
+
+
+// ==========================================
+// PAGE TITLES
+// ==========================================
+
+function updatePageTitle(sectionId) {
+
+    const title =
+        document.getElementById("pageTitle");
+
+    const subtitle =
+        document.getElementById("pageSubtitle");
+
+
+    if (sectionId === "dashboard") {
+
+        title.textContent =
+            "Administration Dashboard";
+
+        subtitle.textContent =
+            "Overview of the SahaySetu civic management system";
+
+    }
+
+
+    else if (sectionId === "users") {
+
+        title.textContent =
+            "User Management";
+
+        subtitle.textContent =
+            "View and manage SahaySetu users";
+
+    }
+
+
+    else if (sectionId === "complaints") {
+
+        title.textContent =
+            "Complaint Management";
+
+        subtitle.textContent =
+            "Monitor complaints received from citizens";
+
+    }
+
+
+    else if (sectionId === "system") {
+
+        title.textContent =
+            "System Information";
+
+        subtitle.textContent =
+            "SahaySetu platform information";
+
+    }
+
+}
 
 
 // ==========================================
@@ -752,18 +297,70 @@ function displayRecentComplaints() {
         );
 
 
+    table.innerHTML = "";
+
+
     const recent =
         complaints.slice(0, 5);
 
 
-    if (!recent.length) {
+    recent.forEach(
+        function (complaint) {
+
+            const row =
+                document.createElement("tr");
+
+
+            row.innerHTML = `
+
+                <td>${complaint.id}</td>
+
+                <td>${complaint.title}</td>
+
+                <td>${complaint.location}</td>
+
+                <td>
+                    ${getStatusHTML(complaint.status)}
+                </td>
+
+            `;
+
+
+            table.appendChild(row);
+
+        }
+    );
+
+}
+
+
+// ==========================================
+// DISPLAY USERS
+// ==========================================
+
+function displayUsers(list) {
+
+    const table =
+        document.getElementById(
+            "usersTable"
+        );
+
+
+    table.innerHTML = "";
+
+
+    if (list.length === 0) {
 
         table.innerHTML = `
+
             <tr>
-                <td colspan="3">
-                    No complaints available.
+
+                <td colspan="5">
+                    No users found.
                 </td>
+
             </tr>
+
         `;
 
         return;
@@ -771,261 +368,312 @@ function displayRecentComplaints() {
     }
 
 
-    table.innerHTML = "";
+    list.forEach(
+        function (user) {
+
+            const row =
+                document.createElement("tr");
 
 
-    recent.forEach(
-        function (complaint) {
+            row.innerHTML = `
 
-            const id =
-                complaint.id ??
-                complaint.complaint_id ??
-                "-";
+                <td>${user.id}</td>
 
+                <td>${user.name}</td>
 
-            const description =
-                complaint.description ??
-                complaint.title ??
-                complaint.complaint ??
-                "Complaint";
+                <td>${user.email}</td>
 
+                <td>${user.role}</td>
 
-            const status =
-                getStatus(
-                    complaint
-                );
-
-
-            const lower =
-                status.toLowerCase();
-
-
-            let className =
-                "pending";
-
-
-            if (
-                lower.includes("resolve")
-            ) {
-
-                className =
-                    "resolved";
-
-            }
-
-            else if (
-                lower.includes("progress")
-            ) {
-
-                className =
-                    "progress";
-
-            }
-
-
-            table.innerHTML += `
-
-                <tr>
-
-                    <td>
-                        #${id}
-                    </td>
-
-                    <td>
-                        ${description}
-                    </td>
-
-                    <td>
-
-                        <span class="status ${className}">
-                            ${status}
-                        </span>
-
-                    </td>
-
-                </tr>
+                <td>
+                    ${getUserStatusHTML(user.status)}
+                </td>
 
             `;
 
+
+            table.appendChild(row);
+
         }
     );
 
 }
 
 
-
 // ==========================================
-// STATISTICS
+// USER SEARCH
 // ==========================================
 
-function calculateStatistics() {
+function searchUsers() {
 
-    let resolved = 0;
-
-    let pending = 0;
-
-
-    complaints.forEach(
-        function (complaint) {
-
-            const status =
-                getStatus(
-                    complaint
-                ).toLowerCase();
+    const search =
+        document
+            .getElementById("userSearch")
+            .value
+            .toLowerCase();
 
 
-            if (
-                status.includes(
-                    "resolve"
-                )
-            ) {
+    const role =
+        document
+            .getElementById("roleFilter")
+            .value
+            .toLowerCase();
 
-                resolved++;
+
+    const filtered =
+        users.filter(
+            function (user) {
+
+                const text =
+                    (
+                        user.name +
+                        " " +
+                        user.email +
+                        " " +
+                        user.id
+                    ).toLowerCase();
+
+
+                const searchMatch =
+                    text.includes(search);
+
+
+                const roleMatch =
+                    role === "all" ||
+                    user.role.toLowerCase() === role;
+
+
+                return searchMatch && roleMatch;
 
             }
-
-            else {
-
-                pending++;
-
-            }
-
-        }
-    );
+        );
 
 
-    document.getElementById(
-        "resolvedComplaints"
-    ).textContent =
-        resolved;
-
-
-    document.getElementById(
-        "pendingComplaints"
-    ).textContent =
-        pending;
+    displayUsers(filtered);
 
 }
 
 
+// ==========================================
+// REFRESH USERS
+// ==========================================
+
+function refreshUsers() {
+
+    displayUsers(users);
+
+}
+
 
 // ==========================================
-// NAVIGATION
+// DISPLAY COMPLAINTS
 // ==========================================
 
-function showSection(
-    sectionId,
-    button
-) {
+function displayComplaints(list) {
 
-    document
-        .querySelectorAll(".section")
-        .forEach(
-            function (section) {
-
-                section.classList.remove(
-                    "active"
-                );
-
-            }
+    const table =
+        document.getElementById(
+            "complaintsTable"
         );
 
 
-    document
-        .querySelectorAll(".menu-item")
-        .forEach(
-            function (item) {
-
-                item.classList.remove(
-                    "active"
-                );
-
-            }
-        );
+    table.innerHTML = "";
 
 
-    document
-        .getElementById(
-            sectionId
-        )
-        .classList.add(
-            "active"
-        );
+    if (list.length === 0) {
 
+        table.innerHTML = `
 
-    if (button) {
+            <tr>
 
-        button.classList.add(
-            "active"
-        );
+                <td colspan="5">
+                    No complaints found.
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
 
     }
 
 
-    const titles = {
+    list.forEach(
+        function (complaint) {
 
-        dashboard:
-            "Administration Dashboard",
-
-        users:
-            "User Management",
-
-        complaints:
-            "Complaint Management",
-
-        system:
-            "System Information"
-
-    };
+            const row =
+                document.createElement("tr");
 
 
-    document.getElementById(
-        "pageTitle"
-    ).textContent =
-        titles[sectionId];
+            row.innerHTML = `
 
-}
+                <td>${complaint.id}</td>
 
+                <td>${complaint.title}</td>
 
+                <td>${complaint.location}</td>
 
-// ==========================================
-// OPEN COMPLAINTS
-// ==========================================
+                <td>${complaint.priority}</td>
 
-function openComplaints() {
+                <td>
+                    ${getStatusHTML(complaint.status)}
+                </td>
 
-    const button =
-        document.querySelectorAll(
-            ".menu-item"
-        )[2];
+            `;
 
 
-    showSection(
-        "complaints",
-        button
+            table.appendChild(row);
+
+        }
     );
 
 }
 
 
+// ==========================================
+// COMPLAINT SEARCH
+// ==========================================
+
+function searchComplaints() {
+
+    const search =
+        document
+            .getElementById("complaintSearch")
+            .value
+            .toLowerCase();
+
+
+    const status =
+        document
+            .getElementById(
+                "complaintStatusFilter"
+            )
+            .value;
+
+
+    const filtered =
+        complaints.filter(
+            function (complaint) {
+
+                const text =
+                    (
+                        complaint.id +
+                        " " +
+                        complaint.title +
+                        " " +
+                        complaint.location +
+                        " " +
+                        complaint.priority
+                    ).toLowerCase();
+
+
+                const searchMatch =
+                    text.includes(search);
+
+
+                let statusMatch = true;
+
+
+                if (status === "pending") {
+
+                    statusMatch =
+                        complaint.status === "Pending";
+
+                }
+
+
+                if (status === "progress") {
+
+                    statusMatch =
+                        complaint.status === "In Progress";
+
+                }
+
+
+                if (status === "resolved") {
+
+                    statusMatch =
+                        complaint.status === "Resolved";
+
+                }
+
+
+                return searchMatch && statusMatch;
+
+            }
+        );
+
+
+    displayComplaints(filtered);
+
+}
+
 
 // ==========================================
-// LOGOUT
+// REFRESH COMPLAINTS
 // ==========================================
 
-function logout() {
+function refreshComplaints() {
 
-    localStorage.removeItem(
-        "access_token"
-    );
+    displayComplaints(complaints);
 
-
-    localStorage.removeItem(
-        "admin_login"
-    );
+}
 
 
-    window.location.href =
-        "administration-login.html";
+// ==========================================
+// STATUS HTML
+// ==========================================
+
+function getStatusHTML(status) {
+
+    let className = "pending";
+
+
+    if (status === "Resolved") {
+
+        className = "resolved";
+
+    }
+
+
+    else if (status === "In Progress") {
+
+        className = "progress";
+
+    }
+
+
+    return `
+        <span class="status ${className}">
+            ${status}
+        </span>
+    `;
+
+}
+
+
+// ==========================================
+// USER STATUS HTML
+// ==========================================
+
+function getUserStatusHTML(status) {
+
+    if (status === "Active") {
+
+        return `
+            <span class="status resolved">
+                Active
+            </span>
+        `;
+
+    }
+
+
+    return `
+        <span class="status pending">
+            Inactive
+        </span>
+    `;
 
 }
