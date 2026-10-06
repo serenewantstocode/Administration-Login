@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SahaySetu - Administration Dashboard</title>
+
+    <link rel="stylesheet" href="administration.css">
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            <div class="logo-box">SS</div>
+
+            <div>
+                <h2>SahaySetu</h2>
+                <span>Administration</span>
+            </div>
+        </div>
+
+
+        <div class="menu">
+
+            <button class="menu-item active"
+                    onclick="showSection('dashboard', this)">
+                <span>⌂</span>
+                Dashboard
+            </button>
+
+            <button class="menu-item"
+                    onclick="showSection('users', this)">
+                <span>👥</span>
+                Users
+            </button>
+
+            <button class="menu-item"
+                    onclick="showSection('complaints', this)">
+                <span>▣</span>
+                Complaints
+            </button>
+
+            <button class="menu-item"
+                    onclick="showSection('system', this)">
+                <span>⚙</span>
+                System
+            </button>
+
+        </div>
+
+
+        <div class="sidebar-bottom">
+
+            <button class="logout-button" onclick="logout()">
+                ↪ &nbsp; Logout
+            </button>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main-content">
+
+
+        <!-- TOP BAR -->
+
+        <header class="topbar">
+
+            <div>
+                <h1 id="pageTitle">
+                    Administration Dashboard
+                </h1>
+
+                <p>
+                    SahaySetu civic management system
+                </p>
+            </div>
+
+
+            <div class="admin-profile">
+
+                <div class="profile-icon">
+                    A
+                </div>
+
+                <div>
+                    <strong id="adminName">
+                        Administrator
+                    </strong>
+
+                    <small>
+                        System Administrator
+                    </small>
+                </div>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- ================= DASHBOARD ================= -->
+
+        <section id="dashboard"
+                 class="section active">
+
+
+            <div class="welcome-card">
+
+                <div>
+
+                    <span>
+                        ADMINISTRATION PORTAL
+                    </span>
+
+                    <h2>
+                        Welcome to SahaySetu
+                    </h2>
+
+                    <p>
+                        Monitor users, complaints and system
+                        activity from one dashboard.
+                    </p>
+
+                </div>
+
+                <div class="welcome-symbol">
+                    🛡️
+                </div>
+
+            </div>
+
+
+
+            <!-- STATISTICS -->
+
+            <div class="stats">
+
+                <div class="stat-card">
+
+                    <div class="stat-icon blue">
+                        👥
+                    </div>
+
+                    <div>
+                        <p>Total Users</p>
+                        <h2 id="totalUsers">0</h2>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon orange">
+                        ⚠
+                    </div>
+
+                    <div>
+                        <p>Total Complaints</p>
+                        <h2 id="totalComplaints">0</h2>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon green">
+                        ✓
+                    </div>
+
+                    <div>
+                        <p>Resolved</p>
+                        <h2 id="resolvedComplaints">0</h2>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon red">
+                        !
+                    </div>
+
+                    <div>
+                        <p>Pending</p>
+                        <h2 id="pendingComplaints">0</h2>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- LOWER DASHBOARD -->
+
+            <div class="dashboard-grid">
+
+
+                <!-- RECENT COMPLAINTS -->
+
+                <div class="card">
+
+                    <div class="card-header">
+
+                        <div>
+                            <h3>Recent Complaints</h3>
+                            <p>Latest complaints received</p>
+                        </div>
+
+                        <button onclick="openComplaints()">
+                            View All
+                        </button>
+
+                    </div>
+
+
+                    <div class="table-wrapper">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Complaint</th>
+                                    <th>Status</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="recentComplaints">
+
+                                <tr>
+                                    <td colspan="3">
+                                        Loading...
+                                    </td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- SYSTEM STATUS -->
+
+                <div class="card">
+
+                    <div class="card-header">
+
+                        <div>
+                            <h3>System Status</h3>
+                            <p>Current platform status</p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="system-list">
+
+                        <div class="system-row">
+                            <span>Backend API</span>
+                            <strong class="online">
+                                ● Online
+                            </strong>
+                        </div>
+
+                        <div class="system-row">
+                            <span>Authentication</span>
+                            <strong class="online">
+                                ● Active
+                            </strong>
+                        </div>
+
+                        <div class="system-row">
+                            <span>Database</span>
+                            <strong class="online">
+                                ● Connected
+                            </strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================= USERS ================= -->
+
+        <section id="users"
+                 class="section">
+
+
+            <div class="section-title">
+
+                <div>
+                    <h2>User Management</h2>
+
+                    <p>
+                        View and monitor SahaySetu users.
+                    </p>
+                </div>
+
+                <button class="refresh-button"
+                        onclick="loadUsers()">
+                    ↻ Refresh
+                </button>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="search-area">
+
+                    <input
+                        type="text"
+                        id="userSearch"
+                        placeholder="Search users..."
+                        oninput="filterUsers()"
+                    >
+
+                </div>
+
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email / Phone</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="usersTable">
+
+                            <tr>
+                                <td colspan="5">
+                                    Loading users...
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================= COMPLAINTS ================= -->
+
+        <section id="complaints"
+                 class="section">
+
+
+            <div class="section-title">
+
+                <div>
+                    <h2>Complaint Management</h2>
+
+                    <p>
+                        Monitor all complaints in the system.
+                    </p>
+                </div>
+
+                <button class="refresh-button"
+                        onclick="loadComplaints()">
+                    ↻ Refresh
+                </button>
+
+            </div>
+
+
+            <div class="card">
+
+
+                <div class="search-area">
+
+                    <input
+                        type="text"
+                        id="complaintSearch"
+                        placeholder="Search complaints..."
+                        oninput="filterComplaints()"
+                    >
+
+
+                    <select
+                        id="statusFilter"
+                        onchange="filterComplaints()">
+
+                        <option value="all">
+                            All Status
+                        </option>
+
+                        <option value="pending">
+                            Pending
+                        </option>
+
+                        <option value="progress">
+                            In Progress
+                        </option>
+
+                        <option value="resolved">
+                            Resolved
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>ID</th>
+                                <th>Description</th>
+                                <th>Location</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="complaintsTable">
+
+                            <tr>
+                                <td colspan="5">
+                                    Loading complaints...
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================= SYSTEM ================= -->
+
+        <section id="system"
+                 class="section">
+
+
+            <div class="section-title">
+
+                <div>
+                    <h2>System Information</h2>
+
+                    <p>
+                        SahaySetu platform configuration.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="system-cards">
+
+                <div class="info-card">
+                    <span>Backend</span>
+                    <strong>FastAPI</strong>
+                </div>
+
+                <div class="info-card">
+                    <span>Database</span>
+                    <strong>PostgreSQL</strong>
+                </div>
+
+                <div class="info-card">
+                    <span>Frontend</span>
+                    <strong>HTML / CSS / JavaScript</strong>
+                </div>
+
+                <div class="info-card">
+                    <span>Authentication</span>
+                    <strong>Bearer Token</strong>
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <script src="administration.js"></script>
+
+</body>
+
+</html>
